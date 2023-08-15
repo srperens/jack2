@@ -20,6 +20,8 @@
 #include "JackTime.h"
 #include "JackError.h"
 
+jack_time_t (*_jack_get_microseconds)(void) = 0;
+
 static LARGE_INTEGER _jack_freq;
 static UINT gPeriod = 0;
 
@@ -53,17 +55,56 @@ SERVER_EXPORT void EndTime()
     }
 }
 
-SERVER_EXPORT jack_time_t GetMicroSeconds(void)
+static jack_time_t jack_get_microseconds_from_qpc (void) 
 {
 	LARGE_INTEGER t1;
 	QueryPerformanceCounter(&t1);
 	return (jack_time_t)(((double)t1.QuadPart) / ((double)_jack_freq.QuadPart) * 1000000.0);
 }
 
+static jack_time_t jack_get_microseconds_from_system (void)
+{
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    ULARGE_INTEGER li;
+    li.LowPart = ft.dwLowDateTime;
+    li.HighPart = ft.dwHighDateTime;
+    unsigned long long valueAsHns = li.QuadPart;
+    unsigned long long valueAsUs = valueAsHns/10;
+
+    return (jack_time_t) valueAsUs;
+}
+
 void SetClockSource(jack_timer_type_t source)
-{}
+{
+    jack_log("Clock source : %s", ClockSourceName(source));
+
+	switch (source)
+	{
+        case JACK_TIMER_QPC:
+            _jack_get_microseconds = jack_get_microseconds_from_qpc;
+            break;
+        case JACK_TIMER_SYSTEM_CLOCK:
+            default:
+            _jack_get_microseconds = jack_get_microseconds_from_system;
+            break;
+	}
+}
 
 const char* ClockSourceName(jack_timer_type_t source)
 {
-    return "";
+    switch (source) {
+        case JACK_TIMER_QPC:
+            return "QueryPerformanceCounter";
+        case JACK_TIMER_SYSTEM_CLOCK:
+            return "system clock via GetSystemTimeAsFileTime";
+	}
+
+	/* what is wrong with gcc ? */
+	return "unknown";
+}
+
+SERVER_EXPORT jack_time_t GetMicroSeconds()
+{
+	return _jack_get_microseconds();
 }
