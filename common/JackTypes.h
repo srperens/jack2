@@ -40,7 +40,7 @@ typedef uint16_t jack_int_t;  // Internal type for ports and refnum
 typedef enum {
 	JACK_TIMER_SYSTEM_CLOCK,
 	JACK_TIMER_HPET,
-#ifdef _WIN32
+#ifdef WIN32
   JACK_TIMER_QPC,
 #endif
 } jack_timer_type_t;

@@ -371,7 +371,7 @@ int main(int argc, char** argv)
                 break;
         #endif
 
-        #ifdef _WIN32
+        #ifdef WIN32
             case 'c':
                 param = jackctl_get_parameter(server_parameters, "clock-source");
                 if (param != NULL) {
