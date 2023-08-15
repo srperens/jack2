@@ -272,7 +272,7 @@ int main(int argc, char** argv)
     }
     const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:C:"
         "a:"
-#ifdef __linux__
+#if defined(__linux__) || defined(WIN32)
         "c:"
 #endif
         ;
