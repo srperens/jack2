@@ -278,7 +278,7 @@ int main(int argc, char** argv)
         ;
 
     struct option long_options[] = {
-#ifdef __linux__
+#if defined(__linux__) || defined(WIN32)
                                        { "clock-source", 1, 0, 'c' },
 #endif
                                        { "internal-session-file", 1, 0, 'C' },
