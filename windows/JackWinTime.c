@@ -65,7 +65,9 @@ static jack_time_t jack_get_microseconds_from_qpc (void)
 static jack_time_t jack_get_microseconds_from_system (void)
 {
     FILETIME ft;
-    GetSystemTimeAsFileTime(&ft);
+    //GetSystemTimeAsFileTime(&ft);   //windows2000  -4
+    GetSystemTimePreciseAsFileTime(&ft);  //windows8
+
     ULARGE_INTEGER li;
     li.LowPart = ft.dwLowDateTime;
     li.HighPart = ft.dwHighDateTime;
