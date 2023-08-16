@@ -64,7 +64,7 @@ void JackTimedDriver::ProcessWait()
         jack_error("JackTimedDriver::Process XRun = %ld usec", (cur_time_usec - fBeginDateUst));
     }
 
-    jack_log("JackTimedDriver::Process wait_time = %d", wait_time_usec);
+    //jack_log("JackTimedDriver::Process wait_time = %d", wait_time_usec);
     JackSleep(wait_time_usec);
 }
 

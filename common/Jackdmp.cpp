@@ -272,13 +272,13 @@ int main(int argc, char** argv)
     }
     const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:C:"
         "a:"
-#ifdef __linux__
+#if defined(__linux__) || defined(WIN32)
         "c:"
 #endif
         ;
 
     struct option long_options[] = {
-#ifdef __linux__
+#if defined(__linux__) || defined(WIN32)
                                        { "clock-source", 1, 0, 'c' },
 #endif
                                        { "internal-session-file", 1, 0, 'C' },
@@ -359,6 +359,27 @@ int main(int argc, char** argv)
                          * command line, but use the system clock instead
                          */
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (tolower (optarg[0]) == 's') {
+                        value.ui = JACK_TIMER_SYSTEM_CLOCK;
+                        jackctl_parameter_set_value(param, &value);
+                    } else {
+                        usage(stdout, server_ctl);
+                        goto destroy_server;
+                    }
+                }
+                break;
+        #endif
+
+        #ifdef WIN32
+            case 'c':
+                param = jackctl_get_parameter(server_parameters, "clock-source");
+                if (param != NULL) {
+                    if (tolower (optarg[0]) == 'h') {
+                        value.ui = JACK_TIMER_QPC;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (tolower (optarg[0]) == 'c') {
+                        value.ui = JACK_TIMER_QPC;
                         jackctl_parameter_set_value(param, &value);
                     } else if (tolower (optarg[0]) == 's') {
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
